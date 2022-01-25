@@ -3,7 +3,7 @@ import { useParams } from "react-router";
 import axios from "axios";
 import { apiBaseUrl } from "../constants";
 
-import { useStateValue } from "../state";
+import { useStateValue, updatePatient } from "../state";
 
 import { PatientWithEntries } from "../types";
 
@@ -26,10 +26,7 @@ export default function SinglePatientPage() {
           await axios.get<PatientWithEntries>(`${apiBaseUrl}/patients/${id}`);
 
         if (!patientIsUpdated(patientFromBackend)) {
-          dispatch({
-            type: "UPDATE_PATIENT",
-            payload: { patientFromBackend, id },
-          });
+          dispatch(updatePatient(patientFromBackend, id));
         }
       } catch (error: unknown) {
         let errorMessage = "Something went wrong.";
