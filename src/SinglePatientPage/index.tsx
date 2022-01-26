@@ -5,16 +5,14 @@ import { apiBaseUrl } from "../constants";
 
 import { useStateValue, updatePatient } from "../state";
 
-import { PatientWithEntries } from "../types";
+import { Patient, Entry } from "../types";
 
 export default function SinglePatientPage() {
   const [{ patients }, dispatch] = useStateValue();
 
   const { id } = useParams<{ id: string }>(); ///////////////////
 
-  const patientIsUpdated = (
-    patientFromBackend: PatientWithEntries
-  ): boolean => {
+  const patientIsUpdated = (patientFromBackend: Patient): boolean => {
     return patients[id] === patientFromBackend;
   };
 
@@ -22,8 +20,9 @@ export default function SinglePatientPage() {
   useEffect(() => {
     const getSinglePatientData = async () => {
       try {
-        const { data: patientFromBackend } =
-          await axios.get<PatientWithEntries>(`${apiBaseUrl}/patients/${id}`);
+        const { data: patientFromBackend } = await axios.get<Patient>(
+          `${apiBaseUrl}/patients/${id}`
+        );
 
         if (!patientIsUpdated(patientFromBackend)) {
           dispatch(updatePatient(patientFromBackend, id));
@@ -56,6 +55,19 @@ export default function SinglePatientPage() {
       SSN: {patients[id].ssn}
       <br />
       Occupation {patients[id].occupation}
+      <h2>Entries</h2>
+      {(patients[id].entries || []).map((entry: Entry) => {
+        return (
+          <div key={entry.id}>
+            {entry.date} {entry.description}
+            <ul>
+              {(entry.diagnosisCodes || []).map((code: string) => (
+                <li key={code}>{code}</li>
+              ))}
+            </ul>
+          </div>
+        );
+      })}
     </div>
   );
 }
