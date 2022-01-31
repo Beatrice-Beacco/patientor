@@ -8,8 +8,12 @@ import { useStateValue, updatePatient } from "../state";
 
 import { Patient, Entry } from "../types";
 
+import HealthCheckEntry from "../components/HealthCheckEntry";
+import OccupationalHealthcareEntry from "../components/OccupationalHealthcareEntry";
+import HospitalEntry from "../components/HospitalEntry";
+
 export default function SinglePatientPage() {
-  const [{ patients, diagnosis }, dispatch] = useStateValue();
+  const [{ patients }, dispatch] = useStateValue();
 
   const { id } = useParams<{ id: string }>(); ///////////////////
 
@@ -43,6 +47,12 @@ export default function SinglePatientPage() {
 
   if (!patients[id]) return <div>Loading...</div>;
 
+  const assertNever = (value: never): never => {
+    throw new Error(
+      `Unhandled discriminated union member: ${JSON.stringify(value)}`
+    );
+  };
+
   return (
     <div>
       <h1>
@@ -58,7 +68,18 @@ export default function SinglePatientPage() {
       Occupation {patients[id].occupation}
       <h2>Entries</h2>
       {(patients[id].entries || []).map((entry: Entry) => {
-        return (
+        switch (entry.type) {
+          case "HealthCheck":
+            return <HealthCheckEntry data={entry} />;
+          case "Hospital":
+            return <HospitalEntry data={entry} />;
+          case "OccupationalHealthcare":
+            return <OccupationalHealthcareEntry data={entry} />;
+          default:
+            assertNever(entry);
+        }
+        {
+          /*         return (
           <div key={entry.id}>
             {entry.date} {entry.description}
             <ul>
@@ -69,7 +90,8 @@ export default function SinglePatientPage() {
               ))}
             </ul>
           </div>
-        );
+        ); */
+        }
       })}
     </div>
   );
