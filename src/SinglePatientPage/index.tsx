@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { Icon } from "semantic-ui-react";
 import { useParams } from "react-router";
 import axios from "axios";
 import { apiBaseUrl } from "../constants";
@@ -8,7 +9,7 @@ import { useStateValue, updatePatient } from "../state";
 import { Patient, Entry } from "../types";
 
 export default function SinglePatientPage() {
-  const [{ patients }, dispatch] = useStateValue();
+  const [{ patients, diagnosis }, dispatch] = useStateValue();
 
   const { id } = useParams<{ id: string }>(); ///////////////////
 
@@ -47,9 +48,9 @@ export default function SinglePatientPage() {
       <h1>
         {patients[id].name}
         {patients[id].gender == "male" ? (
-          <i className="mars"></i>
+          <Icon name="mars" />
         ) : (
-          <i className="venus"></i>
+          <Icon name="venus" />
         )}
       </h1>
       SSN: {patients[id].ssn}
@@ -62,7 +63,9 @@ export default function SinglePatientPage() {
             {entry.date} {entry.description}
             <ul>
               {(entry.diagnosisCodes || []).map((code: string) => (
-                <li key={code}>{code}</li>
+                <li key={code}>
+                  {code} {diagnosis[code].name}
+                </li>
               ))}
             </ul>
           </div>
